@@ -39,8 +39,14 @@ class FlutterCallkitIncoming {
 
   /// Show Callkit Incoming.
   /// On iOS, using Callkit. On Android, using a custom UI.
-  static Future showCallkitIncoming(CallKitParams params) async {
-    await _channel.invokeMethod("showCallkitIncoming", params.toJson());
+  static Future<void> showCallkitIncoming(CallKitParams params) async {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'CALL_DECLINED_CUSTOM') {
+        params.onDecline?.call(call.arguments);
+      }
+    });
+
+    await _channel.invokeMethod('showCallkitIncoming', params.toJson());
   }
 
   /// Show Miss Call Notification.
